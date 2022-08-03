@@ -1,0 +1,27 @@
+type Donut {
+  id: ID!
+  name: String
+  price: Int
+}
+
+type Query {
+  donuts: [Donut]
+  donut(id: Int): Donut
+}
+
+input DonutInput {
+  name: String
+  price: Int
+}
+
+type Mutation {
+  addDonut(input: DonutInput): Donut
+  editDonut(id: Int, input: DonutInput): Donut
+  deleteDonut(id: Int): Donut
+}
+
+type Subscription {
+  addDonut: Donut
+  editDonut(id: Int): Donut
+  deleteDonut(id: Int): Donut
+}
