@@ -44,7 +44,7 @@ export const resolvers = {
         return null;
       }
       const donut = db.donuts[donutIndex];
-      delete db.donuts[donutIndex];
+      db.donuts.splice(donutIndex, 1);
       pubSub.publish("deleteDonut", donut);
       return donut;
     },
