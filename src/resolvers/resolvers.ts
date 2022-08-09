@@ -5,7 +5,14 @@ const pubSub = createPubSub();
 
 export const resolvers = {
   Query: {
-    donuts: (_: any) => db.donuts,
+    donuts: (_: any, { name }: { name: string }) => {
+      if (name) {
+        const searchName = new RegExp(name);
+        return db.donuts.filter((d: any) => searchName.test(d.name));
+      } else {
+        return db.donuts;
+      }
+    },
     donut: (_: any, { id }: { id: number }) => {
       const donutIndex = db.donuts.findIndex((donut: any) => donut.id === id);
       if (donutIndex === -1) {

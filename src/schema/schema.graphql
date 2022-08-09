@@ -5,7 +5,7 @@ type Donut {
 }
 
 type Query {
-  donuts: [Donut]
+  donuts(name: String): [Donut]
   donut(id: Int): Donut
 }
 
