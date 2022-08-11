@@ -5,7 +5,8 @@ const pubSub = createPubSub();
 
 export const resolvers = {
   Query: {
-    donuts: (_: any, { name }: { name: string }) => {
+    donuts: (_: any, { query }: { query: {name: string} }) => {
+      const { name } = query;
       if (name) {
         const searchName = new RegExp(name);
         return db.donuts.filter((d: any) => searchName.test(d.name));

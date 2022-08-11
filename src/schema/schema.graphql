@@ -4,8 +4,12 @@ type Donut {
   price: Int
 }
 
+input DonutsInput {
+  name: String
+}
+
 type Query {
-  donuts(name: String): [Donut]
+  donuts(query: DonutsInput): [Donut]
   donut(id: Int): Donut
 }
 
