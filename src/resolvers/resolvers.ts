@@ -5,7 +5,7 @@ const pubSub = createPubSub();
 
 export const resolvers = {
   Query: {
-    donuts: (_: any, { query }: { query: {name: string} }) => {
+    donuts: (_: any, { query }: { query: { name: string } }) => {
       const { name } = query;
       if (name) {
         const searchName = new RegExp(name);
@@ -43,7 +43,7 @@ export const resolvers = {
       donut.name = input.name;
       donut.price = input.price;
       db.donuts[donutIndex] = donut;
-      pubSub.publish("editDonut", donut);
+      pubSub.publish("editDonut", id, donut);
       return donut;
     },
     deleteDonut: (_: any, { id }: { id: number }) => {
@@ -53,7 +53,7 @@ export const resolvers = {
       }
       const donut = db.donuts[donutIndex];
       db.donuts.splice(donutIndex, 1);
-      pubSub.publish("deleteDonut", donut);
+      pubSub.publish("deleteDonut", id, donut);
       return donut;
     },
   },
@@ -63,11 +63,14 @@ export const resolvers = {
       resolve: (payload: any) => payload,
     },
     editDonut: {
-      subscribe: () => pubSub.subscribe("editDonut"),
+      subscribe: (_: any, { id }: { id: number }) => {
+        return pubSub.subscribe("editDonut", id);
+      },
       resolve: (payload: any) => payload,
     },
     deleteDonut: {
-      subscribe: () => pubSub.subscribe("deleteDonut"),
+      subscribe: (_: any, { id }: { id: number }) =>
+        pubSub.subscribe("deleteDonut", id),
       resolve: (payload: any) => payload,
     },
   },
