@@ -9,7 +9,7 @@ input DonutsInput {
 }
 
 type Query {
-  donuts(query: DonutsInput): [Donut]
+  donuts(query: DonutsInput): [Donut!]!
   donut(id: Int): Donut
 }
 
