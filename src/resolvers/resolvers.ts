@@ -1,7 +1,15 @@
 import { createPubSub } from "@graphql-yoga/node";
-import { db } from "./db";
+import { categoryKVS, donutsDB } from "./db";
 
 const pubSub = createPubSub();
+
+const donutWithCategory = (donut: any) => {
+  const category_id = donut.category_id;
+  //@ts-ignore
+  const category = categoryKVS[category_id];
+  donut["category"] = category;
+  return donut;
+};
 
 export const resolvers = {
   Query: {
@@ -9,52 +17,64 @@ export const resolvers = {
       const { name } = query;
       if (name) {
         const searchName = new RegExp(name);
-        return db.donuts.filter((d: any) => searchName.test(d.name));
+        return donutsDB.donuts
+          .filter((d: any) => searchName.test(d.name))
+          .map(donutWithCategory);
       } else {
-        return db.donuts;
+        return donutsDB.donuts.map(donutWithCategory);
       }
     },
     donut: (_: any, { id }: { id: number }) => {
-      const donutIndex = db.donuts.findIndex((donut: any) => donut.id === id);
+      const donutIndex = donutsDB.donuts.findIndex((donut: any) => donut.id === id);
       if (donutIndex === -1) {
         return null;
       }
-      const donut = db.donuts[donutIndex];
-      return donut;
+      const donut = donutsDB.donuts[donutIndex];
+      return donutWithCategory(donut);
     },
   },
   Mutation: {
     addDonut: (_: any, { input }: { input: any }) => {
       const donut = {
-        id: db.donuts.length + 1,
+        id: donutsDB.donuts.length + 1,
         name: input.name,
         price: input.price,
+        category_id: 1,
       };
-      db.donuts.push(donut);
+      donutsDB.donuts.push(donut);
       pubSub.publish("addDonut", donut);
-      return donut;
+      return donutWithCategory(donut);
     },
     editDonut: (_: any, { id, input }: { id: number; input: any }) => {
-      const donutIndex = db.donuts.findIndex((donut: any) => donut.id === id);
+      const donutIndex = donutsDB.donuts.findIndex((donut: any) => donut.id === id);
       if (donutIndex === -1) {
         return null;
       }
-      const donut = db.donuts[donutIndex];
+      const donut = donutsDB.donuts[donutIndex];
       donut.name = input.name;
       donut.price = input.price;
-      db.donuts[donutIndex] = donut;
+      donutsDB.donuts[donutIndex] = donut;
       pubSub.publish("editDonut", id, donut);
-      return donut;
+      return donutWithCategory(donut);
+    },
+    editCategory: (
+      _: any,
+      { id, input }: { id: number; input: { name: string } }
+    ) => {
+      //@ts-ignore
+      categoryKVS[id] = { id, name: input.name };
+      //@ts-ignore
+      return categoryKVS[id];
     },
     deleteDonut: (_: any, { id }: { id: number }) => {
-      const donutIndex = db.donuts.findIndex((donut: any) => donut.id === id);
+      const donutIndex = donutsDB.donuts.findIndex((donut: any) => donut.id === id);
       if (donutIndex === -1) {
         return null;
       }
-      const donut = db.donuts[donutIndex];
-      db.donuts.splice(donutIndex, 1);
+      const donut = donutsDB.donuts[donutIndex];
+      donutsDB.donuts.splice(donutIndex, 1);
       pubSub.publish("deleteDonut", id, donut);
-      return donut;
+      return donutWithCategory(donut);
     },
   },
   Subscription: {

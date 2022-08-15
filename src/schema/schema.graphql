@@ -2,6 +2,12 @@ type Donut {
   id: ID!
   name: String
   price: Int
+  category: Category!
+}
+
+type Category {
+  id: ID!
+  name: String
 }
 
 input DonutsInput {
@@ -18,9 +24,14 @@ input DonutInput {
   price: Int
 }
 
+input CategoryInput {
+  name: String
+}
+
 type Mutation {
   addDonut(input: DonutInput): Donut
   editDonut(id: Int, input: DonutInput): Donut
+  editCategory(id: Int, input: CategoryInput): Category
   deleteDonut(id: Int): Donut
 }
 
