@@ -2,7 +2,7 @@ type Donut {
   id: ID!
   name: String
   price: Int
-  category: Category!
+  category: Category
 }
 
 type Category {
